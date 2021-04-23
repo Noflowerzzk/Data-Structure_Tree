@@ -79,8 +79,8 @@ private:
 
 		BinaryNode(BinaryNode*& l, BinaryNode*& r, Object& ele)
 			:left{ l }, right{ r }, element{ ele } { }
-		BinaryNode(BinaryNode* l, BinaryNode* r, Object ele)
-			:left{ l }, right{ r }, element{ ele } { }
+		BinaryNode(BinaryNode*&& l, BinaryNode*&& r, Object&& ele)
+			:left{ std::move(l) }, right{ std::move(r) }, element{ std::move(ele) } { }
 	};
 	void insert(const Object& x, BinaryNode*& t)
 	{
@@ -183,4 +183,6 @@ private:
 		else
 			return new BinarySearchTree{ t->element, clone(t->left), clone(t->right) };
 	}
+=======
+>>>>>>> 7db6115354800287209df2e5d4f8488e9bf4c653
 };
