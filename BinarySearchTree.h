@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 template<typename Object>
 class BinarySearchTree
 {
@@ -91,7 +91,7 @@ private:
 		else if (x > t->element)
 			insert(x, t->right);
 		else
-			;  // ÖØ¸´Ôª
+			;  // ï¿½Ø¸ï¿½Ôª
 	}
 	void insert(Object&& x, BinaryNode*& t)
 	{
@@ -102,7 +102,7 @@ private:
 		else if (x > t->element)
 			insert(std::move(x), t->right);
 		else
-			;  // ÖØ¸´Ôª
+			;  // ï¿½Ø¸ï¿½Ôª
 	}
 	void remove(const Object& x, BinaryNode*& t)  /**/
 	{
@@ -115,7 +115,7 @@ private:
 		else if (t->left != nullptr && t->right != nullptr)
 		{
 			t->element = findMin(t->right)->element;
-			remove(t->element, t->right);  // ´ý¸Ä½ø
+			remove(t->element, t->right);  // ï¿½ï¿½ï¿½Ä½ï¿½
 		}
 		else
 		{
