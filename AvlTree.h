@@ -1,31 +1,31 @@
 ﻿#pragma once
 template<typename Object>
-class BinarySearchTree
+class AvlTree
 {
 public:
-	BinarySearchTree()
+	AvlTree()
 		:root{ nullptr } { }
-	BinarySearchTree(const BinarySearchTree& rhs)
+	AvlTree(const AvlTree& rhs)
 		:root{ nullptr }
 	{
 		this->root = clone(rhs.root);
 	}
-	BinarySearchTree(BinarySearchTree&& rhs)
+	AvlTree(AvlTree&& rhs)
 		:root{ nullptr }
 	{
 		root = clone(rhs.root);
 	}
-	~BinarySearchTree()
+	~AvlTree()
 	{
 		makeEmpty();
 	}
 
-	BinarySearchTree& operator = (const BinarySearchTree& rhs)
+	AvlTree& operator = (const AvlTree& rhs)
 	{
 		root = rhs.root;
 		return *this;
 	}
-	BinarySearchTree& operator = (BinarySearchTree&& rhs)
+	AvlTree& operator = (AvlTree&& rhs)
 	{
 		root = rhs.root;
 		return *this;
@@ -73,23 +73,25 @@ public:
 		remove(x, root);
 	}
 private:
-	struct BinaryNode
-	{		
+	struct AvlNode
+	{
 		Object element;
-		BinaryNode* left;
-		BinaryNode* right;
+		AvlNode* left;
+		AvlNode* right;
+		int height;
 
-		BinaryNode(const Object& ele, BinaryNode* l, BinaryNode* r)
-			:element{ ele }, left{ l }, right{ r } { }
-		BinaryNode(Object&& ele, BinaryNode* l, BinaryNode* r)
-			:element{ std::move(ele) }, left{ l }, right{ r } { }
+		AvlNode(const Object& ele, AvlNode* l, AvlNode* r, int h = 0)
+			:element{ ele }, left{ l }, right{ r }, height{ h } { };
+		AvlNode(Object&& ele, AvlNode* l, AvlNode* r, int h = 0)
+			:element{ std::move(ele) }, left{ l }, right{ r }, height{ h } { }
 	};
 
-	BinaryNode* root;
+	AvlNode* root;
+	static const int ALLOWED_BALANCE = 1;
 
 	void insert_private(const Object& x)
 	{
-		BinaryNode* t = root;
+		AvlNode* t = root;
 		// bool side = true;
 
 		while (t != nullptr)
@@ -98,7 +100,7 @@ private:
 			{
 				if (t->left == nullptr)
 				{
-					t->left = new BinaryNode{ x, nullptr, nullptr };
+					t->left = new AvlNode{ x, nullptr, nullptr };
 					return;
 				}
 				else
@@ -111,7 +113,7 @@ private:
 			{
 				if (t->right == nullptr)
 				{
-					t->right = new BinaryNode{ x, nullptr, nullptr };
+					t->right = new AvlNode{ x, nullptr, nullptr };
 					return;
 				}
 				else
@@ -124,13 +126,13 @@ private:
 				return;
 		}
 
-		root = new BinaryNode{ x, nullptr, nullptr };
+		root = new AvlNode{ x, nullptr, nullptr };
 		return;
 	}
-	void insert_private(Object&& x, BinaryNode*& t)
+	void insert_private(Object&& x, AvlNode*& t)
 	{
 		{
-			BinaryNode* t = root;
+			AvlNode* t = root;
 			// bool side = true;
 
 			while (t != nullptr)
@@ -139,7 +141,7 @@ private:
 				{
 					if (t->left == nullptr)
 					{
-						t->left = new BinaryNode{ std::move(x), nullptr, nullptr };
+						t->left = new AvlNode{ std::move(x), nullptr, nullptr };
 						return;
 					}
 					else
@@ -152,7 +154,7 @@ private:
 				{
 					if (t->right == nullptr)
 					{
-						t->right = new BinaryNode{ std::move(x), nullptr, nullptr };
+						t->right = new AvlNode{ std::move(x), nullptr, nullptr };
 						return;
 					}
 					else
@@ -165,11 +167,11 @@ private:
 					return;
 			}
 
-			root = new BinaryNode{ std::move(x), nullptr, nullptr };
+			root = new AvlNode{ std::move(x), nullptr, nullptr };
 			return;
 		}
 	}
-	void remove(const Object& x, BinaryNode*& t)  /**/
+	void remove(const Object& x, AvlNode*& t)  /**/
 	{
 		if (t == nullptr)
 			return;
@@ -184,26 +186,26 @@ private:
 		}
 		else
 		{
-			BinaryNode* Old = t;
+			AvlNode* Old = t;
 			t = (t->left != nullptr) ? t->left : t->right;
 			delete Old;
 		}
 	}
-	BinaryNode* findMin(BinaryNode* t) const
+	AvlNode* findMin(AvlNode* t) const
 	{
 		if (t != nullptr)
 			while (t->left != nullptr)
 				t = t->left;
 		return t;
 	}
-	BinaryNode* findMax(BinaryNode* t) const
+	AvlNode* findMax(AvlNode* t) const
 	{
 		if (t != nullptr)
 			while (t->right != nullptr)
 				t = t->right;
 		return t;
 	}
-	bool contains(const Object& x, BinaryNode* t) const
+	bool contains(const Object& x, AvlNode* t) const
 	{
 		if (t == nullptr)
 			return false;
@@ -214,7 +216,7 @@ private:
 		else
 			return true;
 	}
-	void makeEmpty(BinaryNode*& t)
+	void makeEmpty(AvlNode*& t)
 	{
 		if (t != nullptr)
 		{
@@ -224,7 +226,7 @@ private:
 		}
 		t = nullptr;
 	}
-	void printTree(BinaryNode* t, ostream& out) const
+	void printTree(AvlNode* t, ostream& out) const
 	{
 		if (t != nullptr)
 		{
@@ -233,52 +235,17 @@ private:
 			printTree(t->right, out);
 		}
 	}
-	BinaryNode* clone(BinaryNode* t) const
+	AvlNode* clone(AvlNode* t) const
 	{
 		if (t == nullptr)
 			return nullptr;
 		else
-			return new BinaryNode{ t->element, clone(t->left), clone(t->right) };
+			return new AvlNode{ t->element, clone(t->left), clone(t->right) };
+	}
+
+	inline int height(AvlNode* t)
+	{
+		return t == nullptr ? -1 : t->height;
 	}
 };
 
-void BinarySearchTree_Runner()
-{
-	BinarySearchTree<int> t;
-
-	for (int i = 0; i < 20; i++)
-	{
-		t.insert(i + 1);
-	}
-
-	t.printTree(cout);
-
-	BinarySearchTree<int> t1{ t };
-	t1.printTree(cout);
-
-	BinarySearchTree<int> t2 = t;
-	t2.printTree(cout);
-
-	cout << endl;
-
-	t.insert(21);
-	t.printTree(cout);
-
-	t.insert(11);
-	t.printTree(cout);
-
-	t.insert(-2);
-	t.printTree(cout);
-
-	cout << endl;
-	cout << t.contains(2) << t.contains(190) << endl;
-
-	t.remove(12);
-	cout << t.contains(12) << endl;
-	t.printTree(cout);
-
-	cout << t.findMin() << t.findMax() << endl;
-
-	t.makeEmpty();
-	t.printTree(cout);
-}

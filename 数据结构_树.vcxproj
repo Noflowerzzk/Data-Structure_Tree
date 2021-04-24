@@ -142,6 +142,7 @@
     <ClCompile Include="数据结构_树.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AvlTree.h" />
     <ClInclude Include="BinarySearchTree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
