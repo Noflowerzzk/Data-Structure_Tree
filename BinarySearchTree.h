@@ -20,13 +20,15 @@ public:
 		makeEmpty();
 	}
 
-	Object& operator = (const BinarySearchTree& rhs)
+	BinarySearchTree& operator = (const BinarySearchTree& rhs)
 	{
-		return root = rhs.root;
+		root = rhs.root;
+		return *this;
 	}
-	Object& operator = (BinarySearchTree&& rhs)
+	BinarySearchTree& operator = (BinarySearchTree&& rhs)
 	{
-		return root = rhs.root;
+		root = rhs.root;
+		return *this;
 	}
 
 	const Object& findMin() const
@@ -40,7 +42,7 @@ public:
 
 	bool contains(const Object& x)
 	{
-		contains(root);
+		contains(x, root);
 	}
 	bool isEmpty() const
 	{
@@ -52,7 +54,7 @@ public:
 		if (isEmpty())
 			out << "Empty Tree!";
 		else
-			printTree(root, out);
+			printTree(root, cout);
 	}
 	void makeEmpty()
 	{
@@ -60,11 +62,11 @@ public:
 	}
 	void insert(const Object& x)
 	{
-		insert(x, root);
+		insert_private(x);
 	}
 	void insert(Object&& x)
 	{
-		insert(x, root);
+		insert_private(x);
 	}
 	void remove(const Object& x)
 	{
@@ -72,37 +74,100 @@ public:
 	}
 private:
 	struct BinaryNode
-	{
+	{		
+		Object element;
 		BinaryNode* left;
 		BinaryNode* right;
-		Object element;
 
-		BinaryNode(BinaryNode*& l, BinaryNode*& r, Object& ele)
-			:left{ l }, right{ r }, element{ ele } { }
-		BinaryNode(BinaryNode*&& l, BinaryNode*&& r, Object&& ele)
-			:left{ std::move(l) }, right{ std::move(r) }, element{ std::move(ele) } { }
+		BinaryNode(const Object& ele, BinaryNode* l, BinaryNode* r)
+			:element{ ele }, left{ l }, right{ r } { }
+		BinaryNode(Object&& ele, BinaryNode* l, BinaryNode* r)
+			:element{ std::move(ele) }, left{ l }, right{ r } { }
 	};
-	void insert(const Object& x, BinaryNode*& t)
+
+	BinaryNode* root;
+
+	void insert_private(const Object& x)
 	{
-		if (t == nullptr)
-			t = new BinaryNode{ x, nullptr, nullptr };
-		else if (x < t->element)
-			insert(x, t->left);
-		else if (x > t->element)
-			insert(x, t->right);
-		else
-			;  // �ظ�Ԫ
+		BinaryNode* t = root;
+		// bool side = true;
+
+		while (t != nullptr)
+		{
+			if (x < t->element)
+			{
+				if (t->left == nullptr)
+				{
+					t->left = new BinaryNode{ x, nullptr, nullptr };
+					return;
+				}
+				else
+				{
+					t = t->left;
+					continue;
+				}
+			}
+			else if (x > t->element)
+			{
+				if (t->right == nullptr)
+				{
+					t->right = new BinaryNode{ x, nullptr, nullptr };
+					return;
+				}
+				else
+				{
+					t = t->right;
+					continue;
+				}
+			}
+			else
+				return;
+		}
+
+		root = new BinaryNode{ x, nullptr, nullptr };
+		return;
 	}
-	void insert(Object&& x, BinaryNode*& t)
+	void insert_private(Object&& x, BinaryNode*& t)
 	{
-		if (t == nullptr)
-			t = new BinaryNode{ std::move(x), nullptr, nullptr };
-		else if (x < t->element)
-			insert(std::move(x), t->left);
-		else if (x > t->element)
-			insert(std::move(x), t->right);
-		else
-			;  // �ظ�Ԫ
+		{
+			BinaryNode* t = root;
+			// bool side = true;
+
+			while (t != nullptr)
+			{
+				if (std::move(x) < t->element)
+				{
+					if (t->left == nullptr)
+					{
+						t->left = new BinaryNode{ std::move(x), nullptr, nullptr };
+						return;
+					}
+					else
+					{
+						t = t->left;
+						continue;
+					}
+				}
+				else if (std::move(x) > t->element)
+				{
+					if (t->right == nullptr)
+					{
+						t->right = new BinaryNode{ std::move(x), nullptr, nullptr };
+						return;
+					}
+					else
+					{
+						t = t->right;
+						continue;
+					}
+				}
+				else
+					return;
+			}
+
+			root = new BinaryNode{ std::move(x), nullptr, nullptr };
+			return;
+		}
 	}
 	void remove(const Object& x, BinaryNode*& t)  /**/
 	{
@@ -163,26 +228,49 @@ private:
 		}
 		t = nullptr;
 	}
-	void printTree(BinaryNode* t, std::ostream out) const
+	void printTree(BinaryNode* t, ostream& out) const
 	{
-		if (t == nullptr)
-			return;
-		else if (t->left != nullptr && t->right != nullptr)
+		if (t != nullptr)
 		{
 			printTree(t->left, out);
-			out << t->element << endl;
+			cout << t->element << endl;
 			printTree(t->right, out);
 		}
-		else
-			out << t->element << endl;
 	}
 	BinaryNode* clone(BinaryNode* t) const
 	{
 		if (t == nullptr)
 			return nullptr;
 		else
-			return new BinarySearchTree{ t->element, clone(t->left), clone(t->right) };
+			return new BinaryNode{ t->element, clone(t->left), clone(t->right) };
 	}
-=======
->>>>>>> 7db6115354800287209df2e5d4f8488e9bf4c653
 };
+
+void BinarySearchTree_Runner()
+{
+	BinarySearchTree<int> t;
+
+	for (int i = 0; i < 20; i++)
+	{
+		t.insert(i + 1);
+	}
+
+	t.printTree(cout);
+
+	BinarySearchTree<int> t1{ t };
+	t1.printTree(cout);
+
+	BinarySearchTree<int> t2 = t;
+	t2.printTree(cout);
+
+	cout << endl;
+
+	t.insert(21);
+	t.printTree(cout);
+
+	t.insert(11);
+	t.printTree(cout);
+
+	t.insert(-2);
+	t.printTree(cout);
+}
