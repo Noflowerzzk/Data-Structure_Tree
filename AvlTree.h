@@ -247,5 +247,56 @@ private:
 	{
 		return t == nullptr ? -1 : t->height;
 	}
+	void rotateWithLeftChild(AvlNode*& k2)
+	{
+		AvlNode* k1 = k2->left;
+		k2->left = k1->right;
+		k1->right = k2;
+
+		k2->height = max(height(k2->left), height(k2->right)) + 1;
+		k1->height = max(height(k1->left), k2->height) + 1;
+		
+		k2 = k1;
+	}
+	void rotateWithRightChild(AvlNode*& k2)
+	{
+		AvlNode* k1 = k2->right;
+		k2->right = k1->left;
+		k1->left = k2;
+
+		k2->height = max(height(k2->right), height(k2->left)) + 1;
+		k1->height = max(height(k1->right), k2->height) + 1;
+
+		k2 = k1;
+	}
+	void doubleWithLeftChild(AvlNode*& k3)
+	{
+		AvlNode*& k2 = k3->left->right;
+		k3->left->right = k2->left;
+		k2->left = k3->left;
+		k3->left = k2->right;
+		k2->right = k3;
+
+		k2->left->height = max(height(k2->left->right), height(k2->left->right)) + 1;
+		k3->height = max(height(k3->left), height(k3->right)) + 1;
+		k2->height = max(height(k2->left), height(k2->right)) + 1;
+
+		k3 = k2;
+	}
+	void doubleWithRightChild(AvlNode*& k3)
+	{
+		AvlNode*& k2 = k3->right->left;
+		k3->right->left = k2->right;
+		k2->right = k3->right;
+		k3->right = k2->left;
+		k2->left = k3;
+
+		k2->right->height = max(height(k2->right->right), height(k2->right->right)) + 1;
+		k3->height = max(height(k3->left), height(k3->right)) + 1;
+		k2->height = max(height(k2->left), height(k2->right)) + 1;
+
+		k3 = k2;
+	}
+
 };
 
