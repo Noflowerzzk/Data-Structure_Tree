@@ -96,34 +96,140 @@ private:
 
 		while (t != nullptr)
 		{
-			if (x < t->element)
-			{
-				if (t->left == nullptr)
-				{
-					t->left = new AvlNode{ x, nullptr, nullptr };
-					return;
-				}
-				else
-				{
-					t = t->left;
-					continue;
-				}
-			}
-			else if (x > t->element)
-			{
-				if (t->right == nullptr)
-				{
-					t->right = new AvlNode{ x, nullptr, nullptr };
-					return;
-				}
-				else
-				{
-					t = t->right;
-					continue;
-				}
-			}
-			else
+			if (x == t->element || x == t->left->element || x == t->right->element )
 				return;
+			else if (x < t->left->element) //向X
+			{
+				if (t->left->left == nullptr) //插入
+				{
+					t->left->left = new AvlNode{ x,nullptr,nullptr };
+					if (t->left->right == nullptr)
+						rotateWithLeftChild(t);
+					return;
+				}
+				else if (height(t->left) + 1 - height(t->right) > ALLOWED_BALANCE) //k2左深
+				{
+					rotateWithLeftChild(t);
+					t = t->left; //x
+					continue;
+				}
+				else
+				{
+					t = t->left->left;
+					continue;
+				}
+			}
+			else if (x > t->right->element) //向X
+			{
+				if (t->right->right == nullptr) //插入
+				{
+					t->right->right = new AvlNode{ x,nullptr,nullptr };
+					if (t->right->left == nullptr)
+						rotateWithRightChild(t);
+					return;
+				}
+				else if (height(t->right) + 1 - height(t->left) > ALLOWED_BALANCE) //k2左深
+				{
+					rotateWithRightChild(t);
+					t = t->right; //x
+					continue;
+				}
+				else
+				{
+					t = t->right->right;
+					continue;
+				}
+			}
+			else if (x<t->element && x>t->left->element) //双旋转,向下图k2
+			{
+				if (x < t->left->right->element) //向B
+				{
+					if (t->left->right->left == nullptr)
+					{
+						t->left->right->left = new AvlNode{ x,nullptr,nullptr };
+						if (t->left->right->right == nullptr)
+							doubleWithLeftChild(t);
+						return;
+					}
+					else if (height(t->left->right) + 1 - height(t->left) > ALLOWED_BALANCE) //左双
+					{
+						doubleWithLeftChild(t);
+						t = t->left->right;
+						continue;
+					}
+					else
+					{
+						t = t->left->right->left;
+						continue;
+					}
+				}
+				else if (x > t->left->right->element) //向C
+				{
+					if (t->left->right->right == nullptr) //
+					{
+						t->left->right->right = new AvlNode{ x,nullptr,nullptr };
+						if (t->left->right->left == nullptr)
+							doubleWithLeftChild(t);
+						return;
+					}
+					else if (height(t->left->right) + 1 - height(t->left) > ALLOWED_BALANCE) //左双
+					{
+						doubleWithLeftChild(t);
+						t = t->right->left;
+						continue;
+					}
+					else
+					{
+						t = t->left->right->right;
+						continue;
+					}
+				}
+			}
+			else if (x>t->element && x<t->right->element) //双旋转,向下图k2
+			{
+				if (x > t->right->left->element) //向B
+				{
+					if (t->right->left->right == nullptr)
+					{
+						t->right->left->right = new AvlNode{ x,nullptr,nullptr };
+						if (t->right->left->left == nullptr)
+							doubleWithRightChild(t);
+						return;
+					}
+					else if (height(t->right->left) + 1 - height(t->right) > ALLOWED_BALANCE) //左双
+					{
+						doubleWithRightChild(t);
+						t = t->right->left;
+						continue;
+					}
+					else
+					{
+						t = t->right->left->right;
+						continue;
+					}
+				}
+				else if (x < t->right->left->element) //向C
+				{
+					if (t->right->left->left == nullptr) //
+					{
+						t->right->left->left = new AvlNode{ x,nullptr,nullptr };
+						if (t->right->left->right == nullptr)
+							doubleWithRightChild(t);
+						return;
+					}
+					else if (height(t->right->left) + 1 - height(t->right) > ALLOWED_BALANCE) //左双
+					{
+						doubleWithRightChild(t);
+						t = t->left->right;
+						continue;
+					}
+					else
+					{
+						t = t->right->left->left;
+						continue;
+					}
+				}
+			}
 		}
 
 		root = new AvlNode{ x, nullptr, nullptr };
@@ -230,8 +336,14 @@ private:
 	{
 		if (t != nullptr)
 		{
+			for (int i = t->height; i > 0; i++)
+				cout << '\t';
 			printTree(t->left, out);
+			for (int i = t->height; i >= 0; i++)
+				cout << '\t';
 			cout << t->element << endl;
+			for (int i = t->height; i > 0; i++)
+				cout << '\t';
 			printTree(t->right, out);
 		}
 	}
@@ -300,3 +412,13 @@ private:
 
 };
 
+
+void AvlTree_runner()
+{
+	AvlTree<int> t{};
+
+	for (int i = 1; i < 10; i++)
+		t.insert(i);
+
+	t.printTree(cout);
+}
