@@ -4,6 +4,7 @@
 using namespace std;
 
 #include <iostream>
+#include <stack>
 #include "BinarySearchTree.h"
 #include "AvlTree.h"
 
